@@ -321,13 +321,14 @@ class Speech():
     #   print('error, that\'s not one of ours!')
     # print(self.commands[np.argmax(pred, axis=1)])
 
-def trial_runs(model, word):
+def trial_runs(model, word, count, test):
   results = []
   label = -1
   if word == 'stop': label = 5
   if word == 'go': label = 1
-  for x in range(9):
-    filepath = 'tests/%s/%d_%s.wav' % (word,x,word)
+  if word == 'right': label = 4
+  for x in range(count+1):
+    filepath = 'tests/%s/%s/%d_%s.wav' % (test,word,x,word)
     preds = np.array(model.predict_word(filepath))
     print(model.commands[np.argmax(preds, axis=1)])
     results.append(preds[0][label])
@@ -345,11 +346,24 @@ if __name__ == "__main__":
 
   # model.test_model()
 
-  test_go = trial_runs(model,'go')
-  test_stop = trial_runs(model,'stop')
+  test_go = trial_runs(model,'go',8,'distance')
+  test_stop = trial_runs(model,'stop',8,'distance')
   fig1 = plt.figure()
   plt.plot(test_go, label='go')
   plt.plot(test_stop, label='stop')
   plt.legend()
   plt.title("Victor's Voice - Distance vs Output Neuron per Label")
+  plt.xlabel("Distance (m)")
+  plt.ylabel("Output Neuron Confidence")
+
+  test_right = trial_runs(model,'right',6,'noise')
+  test_stop2 = trial_runs(model,'stop',6,'noise')
+  fig2 = plt.figure()
+  plt.plot(test_right, label='right')
+  plt.plot(test_stop2, label='stop')
+  plt.legend()
+  plt.title("Omar's Voice - Noise vs Output Neuron per Label")
+  plt.xlabel("Noise (+2dB per interval)")
+  plt.ylabel("Output Neuron Confidence")
+
   plt.show()
